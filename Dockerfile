@@ -1,11 +1,16 @@
-FROM azul/zulu-openjdk:20-jre-headless-latest AS builder
+ARG BASE_VERSION
+
+FROM azul/zulu-openjdk:$BASE_VERSION AS builder
 
 RUN apt-get update && apt-get install -y jq curl busybox
 RUN mkdir /emptydir
+
+# Create symlinks to busybox to provide common Unix utilities (see https://busybox.net/FAQ.html#getting_started)
 RUN mkdir /busybox_dir
 RUN for i in $(busybox --list); do ln -s busybox /busybox_dir/$i; done
 
 FROM scratch
+ARG JAVA_VERSION
 
 COPY --from=builder \
         /usr/lib/x86_64-linux-gnu/libc.so* \
@@ -70,7 +75,7 @@ COPY --from=builder \
 
 COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
 
-COPY --from=builder /usr/lib/jvm/zulu20-ca-amd64 /usr/lib/jvm/zulu
+COPY --from=builder /usr/lib/jvm/zulu${JAVA_VERSION}-ca-amd64 /usr/lib/jvm/zulu
 
 COPY --from=builder /emptydir /tmp
 
