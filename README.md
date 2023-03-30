@@ -2,20 +2,16 @@
 
 ## Build one version manually
 
-Note: use `--platform linux/amd64` if running on an ARM platform (e.g. Apple Silicon), as we only support amd64 architecture for now. 
+Supported platforms: `linux/amd64`, `linux/arm64`
 
 Example:
 
 ```shell
 docker build \
   --platform linux/amd64 \
-  --build-arg "base_version=20-jre-headless-latest" \
-  --tag gatlingcorp/docker-openjdk-base:local \
+  --build-arg BASE_IMAGE=azul/zulu-openjdk:17-jre-headless-latest \
+  --build-arg JAVA_VERSION=17 \
+  --build-arg TARGETPLATFORM=linux/amd64 \
+  --tag gatlingcorp/openjdk-base:local \
   .
-```
-
-## Build all versions
-
-```shell
-./build_base_image.sh
 ```
