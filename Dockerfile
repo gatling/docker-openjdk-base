@@ -1,6 +1,6 @@
-ARG BASE_VERSION
+ARG BASE_IMAGE
 
-FROM azul/zulu-openjdk:$BASE_VERSION AS builder
+FROM $BASE_IMAGE AS builder
 
 RUN apt-get update && apt-get install -y jq curl busybox
 RUN mkdir /emptydir

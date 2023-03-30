@@ -1,26 +1,22 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
-function build_image() {
-  tag_version=$1
-  base_version=$2
-  java_version=$3
+java_version="$1"
+if [ -z "${2-}" ]; then
+  target_version="$java_version"
+else
+  target_version="$2"
+fi
 
-  echo
-  echo "----------------------------------------"
-  echo "Building image version $tag_version from base image version $base_version..."
-  docker build \
-    --platform linux/amd64 \
-    --build-arg "BASE_VERSION=$base_version" \
-    --build-arg "JAVA_VERSION=$java_version" \
-    --tag "gatlingcorp/docker-openjdk-base:$tag_version" \
-    .
-  echo "Built image gatlingcorp/docker-openjdk-base:$tag_version."
-  echo "----------------------------------------"
-}
+base_image="azul/zulu-openjdk:$java_version-jre-headless-latest"
+target_image="gatlingcorp/openjdk-base:$target_version-jre-headless"
 
-build_image "latest-jre-headless" "20-jre-headless-latest" "20"
-build_image "17-jre-headless" "17-jre-headless-latest" "17"
-build_image "11-jre-headless" "11-jre-headless-latest" "11"
-build_image "8-jre-headless" "8-jre-headless-latest" "8"
+docker build \
+  --platform linux/amd64 \
+  --build-arg "BASE_IMAGE=$base_image" \
+  --build-arg "JAVA_VERSION=$java_version" \
+  --tag "$target_image" \
+  .
+
+docker push "$target_image"
