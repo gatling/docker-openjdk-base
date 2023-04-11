@@ -6,8 +6,11 @@ RUN apt-get update && apt-get install -y jq curl busybox
 RUN mkdir /emptydir
 
 # Create symlinks to busybox to provide common Unix utilities (see https://busybox.net/FAQ.html#getting_started)
-RUN mkdir /busybox_dir
-RUN for i in $(busybox --list); do ln -s busybox /busybox_dir/$i; done
+# Create symlink to /usr/bin which will be copied to /bin
+RUN mkdir -p /symlinks/busybox && \
+    mkdir -p /symlinks/root && \
+    for i in $(busybox --list); do ln -s busybox /symlinks/busybox/$i; done && \
+    ln -s /usr/bin /symlinks/root/bin
 
 # Prepare all files to be copied to the target image, depending on the platform
 ARG TARGETPLATFORM
@@ -94,8 +97,7 @@ FROM scratch
 
 COPY --from=builder /copied_lib/ /
 
-COPY --from=builder /busybox_dir/ /bin/
-
+COPY --from=builder /symlinks/busybox/ /usr/bin/
 COPY --from=builder \
         /usr/bin/bash \
         /usr/bin/sh \
@@ -103,7 +105,8 @@ COPY --from=builder \
         /usr/bin/nohup \
         /usr/bin/jq \
         /usr/bin/curl \
-        /bin/
+        /usr/bin/
+COPY --from=builder /symlinks/root/ /
 
 COPY --from=builder /copied_zulu /usr/lib/jvm/zulu
 
