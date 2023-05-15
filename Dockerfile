@@ -14,7 +14,7 @@ RUN mkdir -p /symlinks/busybox && \
 
 # Prepare all files to be copied to the target image, depending on the platform
 ARG TARGETPLATFORM
-ARG JAVA_VERSION
+ARG JAVA_MAJOR
 RUN case "${TARGETPLATFORM}" in \
         "linux/amd64") \
             ORIG_DIR="/usr/lib/x86_64-linux-gnu" && \
@@ -85,15 +85,19 @@ RUN case "${TARGETPLATFORM}" in \
 RUN mkdir /copied_zulu/ && \
     case "${TARGETPLATFORM}" in \
         "linux/amd64") \
-            cp -r "/usr/lib/jvm/zulu${JAVA_VERSION}-ca-amd64/." /copied_zulu \
+            cp -r "/usr/lib/jvm/zulu${JAVA_MAJOR}-ca-amd64/." /copied_zulu \
             ;; \
         "linux/arm64") \
-            cp -r "/usr/lib/jvm/zulu${JAVA_VERSION}-ca-arm64/." /copied_zulu \
+            cp -r "/usr/lib/jvm/zulu${JAVA_MAJOR}-ca-arm64/." /copied_zulu \
             ;; \
         *) exit 1 ;; \
     esac
 
 FROM scratch
+
+ARG JAVA_VERSION
+
+LABEL java.version=$JAVA_VERSION
 
 COPY --from=builder /copied_lib/ /
 

@@ -24,6 +24,8 @@ jobs:
             java: 20
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      BASE_IMAGE: azul/zulu-openjdk:${{ matrix.java }}-jre-headless-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,6 +48,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Get current java version for detailled tags
+        id: java
+        run: |
+          docker pull "$BASE_IMAGE"
+          version=$(docker run --rm "$BASE_IMAGE" java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+          echo "version=$version" # DEBUG echo
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       # build-push-action relies on Docker Buildx
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -55,5 +65,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: gatlingcorp/openjdk-base:${{ matrix.tag }}-jre-headless
           build-args: |
-            BASE_IMAGE=azul/zulu-openjdk:${{ matrix.java }}-jre-headless-latest
-            JAVA_VERSION=${{ matrix.java }}
+            BASE_IMAGE=${{ env.BASE_IMAGE }}
+            JAVA_MAJOR=${{ matrix.java }}
+            JAVA_VERSION=${{ steps.java.outputs.version }}
