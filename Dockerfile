@@ -3,7 +3,7 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE AS builder
 
 RUN apt-get update && apt-get install -y jq curl busybox
-RUN mkdir -p /tmpdir/tmp && chmod -R g=u /tmpdir/tmp
+RUN mkdir -p /tmpdir/tmp && chmod 1777 /tmpdir/tmp
 
 # Create symlinks to busybox to provide common Unix utilities (see https://busybox.net/FAQ.html#getting_started)
 # Create symlink to /usr/bin which will be copied to /bin
