@@ -21,7 +21,7 @@ jobs:
           - tag: 21
             java: 21
           - tag: latest
-            java: 22
+            java: 23
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
