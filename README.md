@@ -9,8 +9,8 @@ Example:
 ```shell
 docker build \
   --platform linux/amd64 \
-  --build-arg BASE_IMAGE=azul/zulu-openjdk:17-jre-headless-latest \
-  --build-arg JAVA_VERSION=17 \
+  --build-arg BASE_IMAGE=azul/zulu-openjdk:25-jre-headless-latest \
+  --build-arg JAVA_VERSION=25 \
   --build-arg TARGETPLATFORM=linux/amd64 \
   --tag gatlingcorp/openjdk-base:local \
   .
